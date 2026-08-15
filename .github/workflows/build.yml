@@ -1,5 +1,4 @@
-- name: Build exe
-        run: npx electron-builder --win nsis portable --publish never
+name: Build Windows EXE
 
 on:
   push:
@@ -20,7 +19,7 @@ jobs:
         run: npm install
 
       - name: Build exe
-        run: npx electron-builder --win nsis portable
+        run: npx electron-builder --win nsis portable --publish never
 
       - uses: actions/upload-artifact@v4
         with:
