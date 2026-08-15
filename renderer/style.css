@@ -47,6 +47,19 @@ html, body {
   user-select: none;
 }
 
+/* ===== Полное отключение нативной полосы прокрутки Chromium =====
+   На маленьких высотах окна ниже включается overflow-y: auto (чтобы
+   контент не обрезался), и без этого правила там появляется системная
+   серая полоса справа. Скроллить всё ещё можно (колёсиком/тачем),
+   просто без уродливого виджета. */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+
 .app {
   position: relative;
   width: 100vw;
@@ -460,7 +473,11 @@ input.settings-field {
   line-height: 1.5;
   height: 100%;
   overflow-y: auto;
+  scrollbar-width: thin;
 }
+.progress-log::-webkit-scrollbar { width: 6px; }
+.progress-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 6px; }
+.progress-log::-webkit-scrollbar-track { background: transparent; }
 
 /* ===== Тост запуска ===== */
 .launch-toast {
