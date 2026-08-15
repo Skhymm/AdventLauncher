@@ -11,12 +11,11 @@
   },
   "github": {
     "modpackRepo": {
-      "owner": "your-github-user",
+      "owner": "Skhymm",
       "repo": "royal-modpack",
-      "comment": "В релизах этого репозитория лежат .jar файлы модов — лаунчер скачает latest release"
+      "branch": "main"
     },
-    "manifestFile": "modpack.json",
-    "manifestComment": "Опционально: файл modpack.json в репозитории со списком { version, modLoader, loaderVersion, mods: [...] } — если он есть, лаунчер берёт версию игры и модлоадер оттуда"
+    "modsFolder": "mods"
   },
   "appData": {
     "folderName": ".royalmmorpg"

@@ -18,23 +18,6 @@ async function downloadFile(url, destPath) {
   fs.writeFileSync(destPath, buffer);
 }
 
-// Узнаёт размер файла на сервере без скачивания (HEAD-запрос, Content-Length).
-// Если сервер не отдаёт Content-Length (бывает у некоторых CDN) - возвращает null,
-// и тогда мы просто не будем переустанавливать мод "по размеру" (но по имени - будем).
-async function getRemoteSize(url) {
-  try {
-    const res = await fetch(url, {
-      method: 'HEAD',
-      headers: { 'User-Agent': 'royal-mmorpg-launcher' }
-    });
-    if (!res.ok) return null;
-    const len = res.headers.get('content-length');
-    return len ? parseInt(len, 10) : null;
-  } catch (err) {
-    return null;
-  }
-}
-
 function getLocalSize(destPath) {
   try {
     return fs.statSync(destPath).size;
@@ -43,52 +26,39 @@ function getLocalSize(destPath) {
   }
 }
 
-// Пытается получить modpack.json из репозитория (список модов + версия/лоадер).
-// Если файла нет — просто берёт .jar файлы из latest release.
-async function getManifest(cfg) {
-  const { owner, repo } = cfg.github.modpackRepo;
-  const manifestFile = cfg.github.manifestFile;
+// Берёт список файлов из папки репозитория (GitHub Contents API) и отбирает
+// только .jar. GitHub сразу отдаёт download_url и size для каждого файла,
+// так что отдельный HEAD-запрос на каждый мод не нужен.
+async function listJarsFromRepo(cfg) {
+  const { owner, repo, branch } = cfg.github.modpackRepo;
+  const folder = cfg.github.modsFolder || '';
 
-  try {
-    const raw = await fetchJson(
-      `https://api.github.com/repos/${owner}/${repo}/contents/${manifestFile}`
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${folder}` +
+    (branch ? `?ref=${encodeURIComponent(branch)}` : '');
+
+  const items = await fetchJson(url);
+
+  if (!Array.isArray(items)) {
+    throw new Error(
+      `Ожидался список файлов из GitHub, но пришло что-то другое. Проверь owner/repo/modsFolder в config.json`
     );
-    const content = Buffer.from(raw.content, 'base64').toString('utf-8');
-    return JSON.parse(content);
-  } catch (err) {
-    return null; // манифеста нет — работаем по релизам
   }
+
+  return items
+    .filter((item) => item.type === 'file' && item.name.endsWith('.jar'))
+    .map((item) => ({ name: item.name, url: item.download_url, size: item.size }));
 }
 
 async function syncModpack(onProgress) {
   const cfg = loadConfig();
-  const { owner, repo } = cfg.github.modpackRepo;
   const modsDir = path.join(getAppDataPath(), 'mods');
   fs.mkdirSync(modsDir, { recursive: true });
 
   onProgress({ stage: 'mods', text: 'Получение списка модов...' });
 
-  const manifest = await getManifest(cfg);
+  const modsToDownload = await listJarsFromRepo(cfg);
 
-  let modsToDownload = [];
-
-  if (manifest && Array.isArray(manifest.mods)) {
-    // Список модов задан явно: [{ name, url, size? }]
-    // Поле size опционально - если задано в modpack.json, не придётся делать
-    // лишний HEAD-запрос на каждый мод.
-    modsToDownload = manifest.mods;
-  } else {
-    // Fallback: берём все .jar из последнего релиза репозитория.
-    // GitHub API сразу отдаёт размер каждого asset - используем его.
-    const release = await fetchJson(
-      `https://api.github.com/repos/${owner}/${repo}/releases/latest`
-    );
-    modsToDownload = (release.assets || [])
-      .filter((a) => a.name.endsWith('.jar'))
-      .map((a) => ({ name: a.name, url: a.browser_download_url, size: a.size }));
-  }
-
-  // Удаляем моды, которых больше нет в списке (чтобы не копились старые версии)
+  // Удаляем моды, которых больше нет в репозитории (чтобы не копились старые версии)
   const wanted = new Set(modsToDownload.map((m) => m.name));
   for (const existing of fs.readdirSync(modsDir)) {
     if (!wanted.has(existing)) {
@@ -97,9 +67,10 @@ async function syncModpack(onProgress) {
   }
 
   let done = 0;
+  const total = modsToDownload.length;
+
   for (const mod of modsToDownload) {
     const dest = path.join(modsDir, mod.name);
-    const total = modsToDownload.length;
 
     if (!fs.existsSync(dest)) {
       // Мода ещё нет локально - обычная установка
@@ -109,17 +80,10 @@ async function syncModpack(onProgress) {
       });
       await downloadFile(mod.url, dest);
     } else {
-      // Мод уже есть - проверяем, не отличается ли он от версии на GitHub.
-      // Размер берём из манифеста/API, если он там есть, иначе делаем HEAD-запрос.
-      onProgress({
-        stage: 'mods',
-        text: `Проверка мода: ${mod.name} (${done + 1}/${total})`
-      });
-
-      const remoteSize = typeof mod.size === 'number' ? mod.size : await getRemoteSize(mod.url);
+      // Мод уже есть - сверяем размер с тем, что отдал GitHub API.
       const localSize = getLocalSize(dest);
 
-      if (remoteSize !== null && localSize !== remoteSize) {
+      if (typeof mod.size === 'number' && localSize !== mod.size) {
         onProgress({
           stage: 'mods',
           text: `Обновление мода: ${mod.name} (${done + 1}/${total})`
@@ -127,8 +91,6 @@ async function syncModpack(onProgress) {
         fs.unlinkSync(dest);
         await downloadFile(mod.url, dest);
       }
-      // Если remoteSize === null (сервер не отдал Content-Length) - оставляем
-      // локальный файл как есть, чтобы не перекачивать моды впустую.
     }
 
     done++;
@@ -137,10 +99,10 @@ async function syncModpack(onProgress) {
   onProgress({ stage: 'mods', text: 'Моды обновлены' });
 
   return {
-    version: manifest?.version || cfg.minecraft.version,
-    modLoader: manifest?.modLoader || cfg.minecraft.modLoader,
-    loaderVersion: manifest?.loaderVersion || cfg.minecraft.loaderVersion
+    version: cfg.minecraft.version,
+    modLoader: cfg.minecraft.modLoader,
+    loaderVersion: cfg.minecraft.loaderVersion
   };
 }
 
-module.exports = { syncModpack, getManifest };
+module.exports = { syncModpack };
