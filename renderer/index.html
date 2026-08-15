@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Royal MMORPG Launcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ===== Верхний блок: лого, ник/настройки, онлайн, истории ===== -->
+    <div class="top-content">
+      <header class="topbar">
+        <img class="logo" src="assets/logo.png" alt="Royal MMORPG">
+
+        <div class="topbar-right" id="topbarRight">
+          <div class="nick-field" title="Ваш никнейм">
+            <svg viewBox="0 0 24 24" width="18" height="18" class="nick-icon">
+              <path fill="rgba(255,255,255,0.55)" d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/>
+            </svg>
+            <input class="nick-input" id="nickInput" maxlength="16" placeholder="Player" autocomplete="off" spellcheck="false" pattern="[A-Za-z0-9_]{3,16}" title="Латиница, цифры и &quot;_&quot;, от 3 до 16 символов">
+          </div>
+          <button class="gear-btn" id="settingsBtn" title="Настройки">
+            <svg viewBox="0 0 24 24" width="26" height="26">
+              <path fill="white" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ===== Онлайн ===== -->
+      <div class="online-row" id="onlineRow">
+        Общий онлайн: <b id="onlineCount">—</b>
+      </div>
+
+      <!-- ===== Истории (из stories.json) ===== -->
+      <div class="stories-row" id="storiesRow"></div>
+    </div>
+
+    <!-- ===== Стив ===== -->
+    <img class="steve" id="steve" src="assets/steve.png" alt="">
+
+    <!-- ===== Низ: версия + играть ===== -->
+    <div class="bottom-row">
+      <div class="version-pill">
+        <span class="dot"></span> Версия <span id="versionText">1.21.1</span>
+      </div>
+      <button class="play-btn" id="playBtn">ИГРАТЬ</button>
+    </div>
+
+    <!-- ===== Тост прогресса запуска ===== -->
+    <div class="launch-toast" id="launchToast"></div>
+
+    <!-- ===== Панель настроек ===== -->
+    <aside class="settings-panel" id="settingsPanel">
+      <div class="settings-header">
+        <h2>Настройки</h2>
+        <button class="back-btn" id="backBtn" title="Назад">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="white" d="M15.5 4.5L8 12l7.5 7.5" stroke="white" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-block">
+        <label class="settings-label">Папка игры</label>
+        <div class="settings-row">
+          <div class="settings-field" id="appDataField">%Appdata%</div>
+          <button class="icon-btn" id="openFolderBtn" title="Открыть папку">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path fill="white" d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" id="chooseFolderBtn" title="Выбрать другую папку">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path fill="white" d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/>
+              <path fill="#232326" d="M13 9v3h3v2h-3v3h-2v-3H8v-2h3V9z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-block">
+        <label class="settings-label">Моды и версия (GitHub)</label>
+        <div class="settings-row">
+          <div class="settings-field" id="modLoaderInfo">—</div>
+          <button class="icon-btn" id="syncModsBtn" title="Проверить обновления модов">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path fill="white" d="M17.65 6.35A7.958 7.958 0 0012 4a8 8 0 108 8h-2a6 6 0 11-1.76-4.24L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-block">
+        <label class="settings-label">Оперативная память</label>
+        <div class="ram-row">
+          <span class="ram-name">Мин.</span>
+          <input class="ram-slider" id="ramMinInput" type="range" min="1" max="16" step="1" value="2">
+          <span class="ram-value" id="ramMinLabel">2 ГБ</span>
+        </div>
+        <div class="ram-row">
+          <span class="ram-name">Макс.</span>
+          <input class="ram-slider" id="ramMaxInput" type="range" min="1" max="16" step="1" value="6">
+          <span class="ram-value" id="ramMaxLabel">6 ГБ</span>
+        </div>
+      </div>
+
+      <div class="settings-block progress-block">
+        <div class="progress-log" id="progressLog">Готово к запуску</div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Установка Royal MMORPG Launcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="installer.css">
+</head>
+<body>
+  <div class="wizard">
+
+    <div class="wizard-side">
+      <img class="wizard-logo" src="../renderer/assets/logo.png" alt="Royal MMORPG">
+      <div class="wizard-steps">
+        <div class="wizard-step" data-step-dot="0"><span>1</span>Начало</div>
+        <div class="wizard-step" data-step-dot="1"><span>2</span>Условия</div>
+        <div class="wizard-step" data-step-dot="2"><span>3</span>Папка</div>
+        <div class="wizard-step" data-step-dot="3"><span>4</span>Установка</div>
+        <div class="wizard-step" data-step-dot="4"><span>5</span>Готово</div>
+      </div>
+    </div>
+
+    <div class="wizard-main">
+
+      <!-- Шаг 0: приветствие -->
+      <section class="screen active" data-step="0">
+        <h1>Добро пожаловать</h1>
+        <p class="screen-text">
+          Этот мастер поможет установить <b>Royal MMORPG Launcher</b>: настроит папку
+          игры, объём памяти и скачает набор модов сервера. Нажмите «Далее», чтобы продолжить.
+        </p>
+      </section>
+
+      <!-- Шаг 1: условия использования -->
+      <section class="screen" data-step="1">
+        <h1>Условия использования</h1>
+        <div class="terms-box" id="termsBox">Загрузка...</div>
+        <label class="agree-row">
+          <input type="checkbox" id="agreeCheckbox">
+          Я прочитал(а) и принимаю условия использования и политику конфиденциальности
+        </label>
+      </section>
+
+      <!-- Шаг 2: папка установки -->
+      <section class="screen" data-step="2">
+        <h1>Папка установки</h1>
+        <label class="dir-option">
+          <input type="radio" name="dirChoice" id="dirDefaultRadio" checked>
+          <div>
+            <div class="dir-option-title">Использовать папку по умолчанию</div>
+            <div class="dir-option-path" id="defaultPathText">...</div>
+          </div>
+        </label>
+        <label class="dir-option">
+          <input type="radio" name="dirChoice" id="dirCustomRadio">
+          <div>
+            <div class="dir-option-title">Выбрать другую папку</div>
+            <div class="dir-option-path" id="customPathText">Не выбрана</div>
+          </div>
+        </label>
+        <button class="secondary-btn" id="browseBtn" type="button">Обзор...</button>
+      </section>
+
+      <!-- Шаг 3: установка -->
+      <section class="screen" data-step="3">
+        <h1>Установка</h1>
+        <p class="screen-text">Скачиваем и настраиваем файлы. Это может занять некоторое время.</p>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="installBar"></div></div>
+        <div class="install-log" id="installLog">Подготовка...</div>
+      </section>
+
+      <!-- Шаг 4: готово -->
+      <section class="screen" data-step="4">
+        <h1>Установка завершена</h1>
+        <p class="screen-text">
+          Royal MMORPG Launcher готов к работе. Нажмите «Готово», чтобы открыть лаунчер.
+        </p>
+      </section>
+
+      <div class="wizard-nav">
+        <button class="secondary-btn" id="backBtn" type="button">Назад</button>
+        <button class="primary-btn" id="nextBtn" type="button">Далее</button>
+        <button class="primary-btn hidden" id="finishBtn" type="button">Готово</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="installer.js"></script>
+</body>
+</html>

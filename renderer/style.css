@@ -1,0 +1,559 @@
+/* ===== Локальные шрифты ===== */
+/* Файлы шрифтов нужно положить в assets/fonts/ рядом с этим CSS: */
+/*   assets/fonts/UbuntuRegular.ttf  — для директории в настройках   */
+/*   assets/fonts/MontserratBold.ttf — для основных надписей         */
+@font-face {
+  font-family: 'UbuntuRegular';
+  src: url('assets/fonts/UbuntuRegular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MontserratBold';
+  src: url('assets/fonts/MontserratBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --panel-width: clamp(300px, 32vw, 400px);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur: 480ms;
+  --bg-dark: #101226;
+  --bg-navy: #171a3d;
+  --accent-green: #35e65b;
+  --panel-bg: #232326;
+  --panel-bg-2: #2c2c30;
+  --gap-h: clamp(14px, 2.8vw, 28px);
+  --gap-v: clamp(14px, 4vh, 32px);
+  --font-ui: 'Rajdhani', 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-display: 'Cinzel', 'Rajdhani', 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-heading: 'MontserratBold', 'Rajdhani', Arial, sans-serif;
+  --font-dir: 'UbuntuRegular', 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  background: var(--bg-dark);
+  user-select: none;
+}
+
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  background:
+    radial-gradient(120% 120% at 15% 15%, rgba(23,26,61,0.55) 0%, rgba(16,18,38,0.75) 65%),
+    url('assets/background.png') center center / cover no-repeat,
+    var(--bg-dark);
+  overflow: hidden;
+}
+
+/* На очень маленьких/низких экранах разрешаем вертикальный скролл,
+   чтобы ни одна кнопка не обрезалась и не пряталась. */
+@media (max-height: 560px), (max-width: 380px) {
+  html, body { overflow-y: auto; }
+  .app { height: auto; min-height: 100dvh; overflow: visible; }
+}
+
+/* ===== Верхний блок (лого + ник/настройки + онлайн + истории) =====
+   Идут обычным потоком друг под другом, поэтому логотип никогда
+   не наезжает на "Общий онлайн" и на карточки историй — сколько бы
+   места логотип ни занимал, следующий блок просто сдвигается ниже. */
+.top-content {
+  position: relative;
+  z-index: 5;
+  padding: var(--gap-v) var(--gap-h) 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.8vh, 18px);
+}
+
+/* ===== Топбар ===== */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logo {
+  height: clamp(84px, 16vh, 190px);
+  max-width: 60vw;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  transition: transform var(--dur) var(--ease), height var(--dur) var(--ease);
+}
+
+.topbar-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(8px, 1.4vw, 14px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  will-change: opacity, transform;
+}
+
+.nick-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1c2050;
+  border-radius: 30px;
+  padding: 0 clamp(14px, 1.6vw, 22px);
+  height: clamp(38px, 5.5vh, 48px);
+  transition: background var(--dur) var(--ease);
+}
+.nick-field:focus-within { background: #262b6b; }
+.nick-icon { flex-shrink: 0; }
+
+.nick-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(13px, 1.4vw, 16px);
+  font-weight: 600;
+  width: clamp(90px, 9vw, 140px);
+}
+.nick-input::placeholder { color: rgba(255,255,255,0.45); }
+.nick-input.invalid { color: #ff6b6b; }
+.nick-field:has(.nick-input.invalid) { box-shadow: 0 0 0 2px rgba(255,107,107,0.55); }
+
+.gear-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: clamp(38px, 5.5vh, 44px);
+  height: clamp(38px, 5.5vh, 44px);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 200ms var(--ease), transform 200ms var(--ease);
+  will-change: transform;
+}
+.gear-btn:hover {
+  background: rgba(255,255,255,0.08);
+  transform: rotate(35deg);
+}
+.gear-btn.spinning svg { animation: spin 900ms var(--ease); }
+@keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(180deg);} }
+
+/* ===== Онлайн ===== */
+.online-row {
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(15px, 2vw, 22px);
+  font-weight: 700;
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  will-change: opacity, transform;
+}
+
+/* ===== Истории (карточки из stories.json) ===== */
+.stories-row {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(10px, 1.6vw, 16px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.stories-row::-webkit-scrollbar { height: 6px; }
+.stories-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 6px; }
+
+.story-card {
+  flex: 0 0 auto;
+  width: clamp(96px, 12vw, 140px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  transition: transform 200ms var(--ease);
+}
+.story-card:hover { transform: translateY(-3px); }
+.story-card:active { transform: translateY(0) scale(0.97); }
+
+.story-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  object-fit: cover;
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  display: block;
+}
+
+.story-title {
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(11px, 1.1vw, 13px);
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ===== Стив ===== */
+.steve {
+  position: absolute;
+  bottom: -10px;
+  right: 40px;
+  height: 92%;
+  max-height: 560px;
+  pointer-events: none;
+  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.55));
+  transition: transform var(--dur) var(--ease);
+  will-change: transform;
+  z-index: 2;
+}
+
+/* ===== Низ ===== */
+.bottom-row {
+  position: absolute;
+  bottom: var(--gap-v);
+  left: var(--gap-h);
+  right: var(--gap-h);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  z-index: 4;
+}
+
+.version-pill {
+  background: #1c2050;
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  font-size: clamp(13px, 1.6vw, 17px);
+  padding: clamp(10px, 1.8vh, 14px) clamp(16px, 2vw, 24px);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.version-pill .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+  flex-shrink: 0;
+}
+
+.play-btn {
+  background: var(--accent-green);
+  color: #0a2411;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(15px, 2vw, 20px);
+  letter-spacing: 0.5px;
+  border: none;
+  padding: clamp(12px, 2vh, 16px) clamp(28px, 4.5vw, 46px);
+  border-radius: 40px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(53,230,91,0.35);
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease), filter 150ms var(--ease);
+  will-change: opacity, transform;
+}
+.play-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.play-btn:active { transform: translateY(0) scale(0.97); }
+.play-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+/* ===== Элементы, скрываемые при открытии настроек ===== */
+.online-row.hidden,
+.play-btn.hidden,
+.topbar-right.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+.play-btn.hidden { transform: translateX(20px); }
+
+/* ===== Панель настроек ===== */
+.settings-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: var(--panel-width);
+  background: linear-gradient(180deg, var(--panel-bg) 0%, var(--panel-bg-2) 100%);
+  transform: translateX(100%);
+  transition: transform var(--dur) var(--ease);
+  will-change: transform;
+  z-index: 10;
+  padding: clamp(18px, 3vh, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-shadow: -12px 0 40px rgba(0,0,0,0.4);
+}
+.settings-panel.open {
+  transform: translateX(0);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settings-header h2 {
+  color: #fff;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 800;
+  font-family: var(--font-heading);
+}
+.back-btn {
+  background: rgba(255,255,255,0.06);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 200ms var(--ease), transform 200ms var(--ease);
+}
+.back-btn:hover { background: rgba(255,255,255,0.14); transform: translateX(-3px); }
+
+.settings-block { display: flex; flex-direction: column; gap: 10px; }
+.settings-label {
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-family: var(--font-heading);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-field {
+  flex: 1;
+  background: #17171a;
+  color: #fff;
+  font-size: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-dir);
+}
+.settings-field.editable:focus {
+  outline: 2px solid var(--accent-green);
+}
+input.settings-field {
+  font-family: var(--font-dir);
+}
+
+.icon-btn {
+  background: #17171a;
+  border: none;
+  width: clamp(40px, 5.5vw, 48px);
+  height: clamp(40px, 5.5vw, 48px);
+  min-width: 40px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 200ms var(--ease), transform 250ms var(--ease);
+}
+.icon-btn:hover { background: #202024; }
+.icon-btn:active svg { transform: rotate(180deg); }
+.icon-btn svg { transition: transform 400ms var(--ease); }
+.icon-btn.spinning svg { animation: spin-full 800ms linear infinite; }
+@keyframes spin-full { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+/* ===== Настройка ОЗУ ===== */
+.ram-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ram-name {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 700;
+  width: 42px;
+  flex-shrink: 0;
+}
+.ram-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 6px;
+  background: #17171a;
+  outline: none;
+}
+.ram-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(53,230,91,0.6);
+  transition: transform 150ms var(--ease);
+}
+.ram-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.ram-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent-green);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(53,230,91,0.6);
+}
+.ram-value {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  width: 48px;
+  text-align: right;
+  flex-shrink: 0;
+  font-family: var(--font-dir);
+}
+
+.progress-block { flex: 1; }
+.progress-log {
+  background: #17171a;
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  line-height: 1.5;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ===== Тост запуска ===== */
+.launch-toast {
+  position: absolute;
+  bottom: 110px;
+  left: 28px;
+  right: 28px;
+  background: rgba(20,22,40,0.92);
+  color: #fff;
+  font-size: 14px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+  pointer-events: none;
+  z-index: 6;
+}
+.launch-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===================================================================
+   Адаптивность: делаем так, чтобы кнопки и элементы управления
+   всегда были видны и не обрезались/не перекрывались на любых
+   устройствах (планшеты, телефоны, узкие/невысокие окна браузера).
+   =================================================================== */
+
+/* Планшеты и узкие окна браузера */
+@media (max-width: 900px) {
+  :root {
+    --panel-width: clamp(280px, 80vw, 380px);
+  }
+  .steve {
+    right: 10px;
+    height: 78%;
+    opacity: 0.9;
+  }
+}
+
+/* Телефоны в портретной ориентации */
+@media (max-width: 640px) {
+  .topbar {
+    justify-content: center;
+    text-align: center;
+  }
+  .topbar-right {
+    width: 100%;
+    justify-content: center;
+  }
+  .nick-input { width: clamp(90px, 40vw, 140px); }
+
+  .online-row {
+    text-align: center;
+  }
+  .stories-row {
+    justify-content: flex-start;
+  }
+
+  .steve {
+    right: 50%;
+    transform: translateX(50%);
+    height: 46vh;
+    max-height: 320px;
+    opacity: 0.55;
+  }
+
+  .bottom-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .version-pill { justify-content: center; }
+  .play-btn {
+    width: 100%;
+    text-align: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    font-size: clamp(16px, 4.5vw, 20px);
+  }
+  .play-btn.hidden { transform: translateY(20px); }
+
+  .settings-panel { width: 100%; }
+}
+
+/* Совсем маленькие экраны / альбомная ориентация телефона */
+@media (max-width: 380px), (max-height: 420px) {
+  :root {
+    --gap-h: 12px;
+    --gap-v: 12px;
+  }
+  .logo { height: clamp(56px, 14vh, 90px); }
+  .steve { display: none; } /* освобождаем место, чтобы низ точно не перекрывался */
+  .story-card { width: clamp(80px, 22vw, 110px); }
+}

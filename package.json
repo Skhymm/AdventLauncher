@@ -1,0 +1,40 @@
+{
+  "name": "royal-mmorpg-launcher",
+  "version": "1.0.0",
+  "description": "Лаунчер Royal MMORPG - открытый мир, с элементами MMORPG в мире Майнкрафт!",
+  "main": "main.js",
+  "author": "Alexei Kurochkin, Ilya Klimov",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win portable nsis"
+  },
+  "dependencies": {
+    "minecraft-launcher-core": "^3.18.1",
+    "minecraft-server-util": "^5.4.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.royalmmorpg.launcher",
+    "productName": "RLauncher",
+    "directories": { "output": "dist" },
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-installer.js",
+      "config.json",
+      "reg.txt",
+      "renderer/**/*",
+      "installer/**/*",
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "renderer/assets/icon.png"
+    }
+  }
+}
