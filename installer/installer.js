@@ -1,7 +1,7 @@
 // ---------- Заглушка для запуска installer.html вне Electron (просмотр в браузере) ----------
 if (!window.installerApi) {
   window.installerApi = {
-    getDefaultPath: async () => 'C:\\Users\\Player\\AppData\\Roaming\\.royalmmorpg',
+    getDefaultPath: async () => 'C:\\Users\\Player\\AppData\\Roaming\\.adventmc',
     getTerms: async () => 'Условия использования доступны только в приложении-лаунчере.',
     chooseDirectory: async () => null,
     runSetup: async () => ({ success: true }),

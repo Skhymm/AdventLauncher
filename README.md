@@ -1,4 +1,4 @@
-# Royal MMORPG Launcher
+# Advent MC Launcher
 
 Офлайн-лаунчер на Electron: моды и версия игры подтягиваются с GitHub, онлайн сервера — через ping (`minecraft-server-util`).
 
@@ -52,7 +52,7 @@ npm run dist:win
 main.js          — Electron main-процесс, IPC
 preload.js        — безопасный мост в renderer
 config.json        — сервер, GitHub, папка данных
-src/config.js       — путь %Appdata%/.royalmmorpg
+src/config.js       — путь %Appdata%/.adventmc
 src/mods.js         — скачивание/синхронизация модов с GitHub
 src/minecraft.js      — установка Fabric + запуск игры (minecraft-launcher-core)
 src/monitor.js       — пинг сервера (онлайн игроков)

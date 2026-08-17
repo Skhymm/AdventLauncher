@@ -1,7 +1,7 @@
 {
-  "name": "royal-mmorpg-launcher",
+  "name": "adventmc-launcher",
   "version": "1.0.0",
-  "description": "Лаунчер Royal MMORPG - открытый мир, с элементами MMORPG в мире Майнкрафт!",
+  "description": "Лаунчер Advent MC - открытый мир, с элементами MMORPG в мире Майнкрафт!",
   "main": "main.js",
   "author": "Alexei Kurochkin, Ilya Klimov",
   "scripts": {
@@ -18,8 +18,8 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.royalmmorpg.launcher",
-    "productName": "RLauncher",
+    "appId": "com.adventmc.launcher",
+    "productName": "Advent MC Launcher",
     "directories": { "output": "dist" },
     "files": [
       "main.js",

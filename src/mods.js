@@ -5,14 +5,14 @@ const { loadConfig, getAppDataPath } = require('./config');
 // Node 18+/Electron имеет встроенный fetch
 async function fetchJson(url) {
   const res = await fetch(url, {
-    headers: { 'User-Agent': 'royal-mmorpg-launcher' }
+    headers: { 'User-Agent': 'adventmc-launcher' }
   });
   if (!res.ok) throw new Error(`GitHub API ошибка ${res.status} на ${url}`);
   return res.json();
 }
 
 async function downloadFile(url, destPath) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'royal-mmorpg-launcher' } });
+  const res = await fetch(url, { headers: { 'User-Agent': 'adventmc-launcher' } });
   if (!res.ok) throw new Error(`Не удалось скачать ${url} (${res.status})`);
   const buffer = Buffer.from(await res.arrayBuffer());
   fs.writeFileSync(destPath, buffer);

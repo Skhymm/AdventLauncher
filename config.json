@@ -1,7 +1,7 @@
 {
   "server": {
-    "name": "Royal MMORPG",
-    "ip": "play.royalmmorpg.ru",
+    "name": "Advent MC",
+    "ip": "play.adventmc.ru",
     "port": 25565
   },
   "minecraft": {
@@ -18,7 +18,7 @@
     "modsFolder": "mods"
   },
   "appData": {
-    "folderName": ".royalmmorpg"
+    "folderName": ".adventmc"
   },
   "memory": {
     "min": "2G",
