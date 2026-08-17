@@ -302,8 +302,12 @@ function hideToast() {
 
 window.api.onLaunchProgress((data) => {
   logLine(data.text);
-  showToast(data.text);
-  if (data.stage === 'done' || data.stage === 'error') {
+  // Поток сырых debug/data-строк от Java идёт только в лог-панель,
+  // иначе тост превращается в бесконечно мигающую простыню текста.
+  if (data.stage !== 'log') {
+    showToast(data.text);
+  }
+  if (data.stage === 'done' || data.stage === 'error' || data.stage === 'closed') {
     setTimeout(hideToast, 3500);
   }
 });
