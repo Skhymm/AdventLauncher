@@ -36,6 +36,9 @@
         Общий онлайн: <b id="onlineCount">—</b>
       </div>
 
+      <!-- ===== Ссылка на вкладку "Моды" ===== -->
+      <button class="mods-link" id="modsLink" type="button">МОДЫ</button>
+
       <!-- ===== Истории (из stories.json) ===== -->
       <div class="stories-row" id="storiesRow"></div>
     </div>
@@ -112,6 +115,20 @@
       <div class="settings-block progress-block">
         <div class="progress-log" id="progressLog">Готово к запуску</div>
       </div>
+    </aside>
+
+    <!-- ===== Панель "Моды" (опциональные, из папки mod/ в поставке лаунчера) ===== -->
+    <aside class="settings-panel mods-panel" id="modsPanel">
+      <div class="settings-header">
+        <h2>Моды</h2>
+        <button class="back-btn" id="modsBackBtn" title="Назад">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="white" d="M15.5 4.5L8 12l7.5 7.5" stroke="white" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mods-grid" id="modsGrid"></div>
     </aside>
 
   </div>

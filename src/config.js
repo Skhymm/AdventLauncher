@@ -117,6 +117,21 @@ function getTermsText() {
   }
 }
 
+// ---------- Опциональные моды (вкладка "Моды", папка mod/ в поставке) ----------
+// Храним только список ID (имён .zip-файлов) уже установленных модов,
+// чтобы: 1) не удалять их jar-файлы при синхронизации модпака с GitHub,
+// 2) показывать в UI кнопку "Установлен" вместо "Скачать".
+function getInstalledOptionalMods() {
+  const settings = loadUserSettings();
+  return Array.isArray(settings.optionalMods) ? settings.optionalMods : [];
+}
+
+function setInstalledOptionalMods(list) {
+  const settings = loadUserSettings();
+  settings.optionalMods = list;
+  saveUserSettings(settings);
+}
+
 module.exports = {
   loadConfig,
   getAppDataPath,
@@ -127,5 +142,7 @@ module.exports = {
   setRamSettings,
   isInstalled,
   markInstalled,
-  getTermsText
+  getTermsText,
+  getInstalledOptionalMods,
+  setInstalledOptionalMods
 };

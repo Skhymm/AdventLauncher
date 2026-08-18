@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('api', {
   setRamSettings: (min, max) => ipcRenderer.invoke('set-ram-settings', { min, max }),
   getSystemRamGb: () => ipcRenderer.invoke('get-system-ram-gb'),
   syncAndLaunch: (username) => ipcRenderer.invoke('sync-and-launch', { username }),
+  listOptionalMods: () => ipcRenderer.invoke('list-optional-mods'),
+  installOptionalMod: (id) => ipcRenderer.invoke('install-optional-mod', id),
+  uninstallOptionalMod: (id) => ipcRenderer.invoke('uninstall-optional-mod', id),
   onLaunchProgress: (callback) => {
     ipcRenderer.on('launch-progress', (_event, data) => callback(data));
   }

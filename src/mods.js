@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { loadConfig, getAppDataPath } = require('./config');
+const { loadConfig, getAppDataPath, getInstalledOptionalMods } = require('./config');
+const { getOptionalModJarNames } = require('./optionalMods');
 
 // Node 18+/Electron имеет встроенный fetch
 async function fetchJson(url) {
@@ -58,8 +59,15 @@ async function syncModpack(onProgress) {
 
   const modsToDownload = await listJarsFromRepo(cfg);
 
-  // Удаляем моды, которых больше нет в репозитории (чтобы не копились старые версии)
+  // Удаляем моды, которых больше нет в репозитории (чтобы не копились старые версии).
+  // Файлы модов, установленных вручную из вкладки "Моды" (папка mod/ в поставке
+  // лаунчера, не GitHub) - не трогаем, иначе они пропадали бы при каждом запуске.
   const wanted = new Set(modsToDownload.map((m) => m.name));
+  for (const optionalId of getInstalledOptionalMods()) {
+    for (const jarName of getOptionalModJarNames(optionalId)) {
+      wanted.add(jarName);
+    }
+  }
   for (const existing of fs.readdirSync(modsDir)) {
     if (!wanted.has(existing)) {
       fs.unlinkSync(path.join(modsDir, existing));

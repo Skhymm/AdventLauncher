@@ -10,6 +10,7 @@
     "dist:win": "electron-builder --win portable nsis"
   },
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "minecraft-launcher-core": "^3.18.1",
     "minecraft-server-util": "^5.4.0"
   },
@@ -30,6 +31,7 @@
       "renderer/**/*",
       "installer/**/*",
       "src/**/*",
+      "mod/**/*",
       "node_modules/**/*"
     ],
     "win": {

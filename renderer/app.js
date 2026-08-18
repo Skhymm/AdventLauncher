@@ -21,6 +21,10 @@ const versionText = document.getElementById('versionText');
 const progressLog = document.getElementById('progressLog');
 const launchToast = document.getElementById('launchToast');
 const storiesRow = document.getElementById('storiesRow');
+const modsLink = document.getElementById('modsLink');
+const modsPanel = document.getElementById('modsPanel');
+const modsBackBtn = document.getElementById('modsBackBtn');
+const modsGrid = document.getElementById('modsGrid');
 
 // ---------- Истории (карточки под "Общий онлайн") ----------
 // Ссылка на stories.json в вашем GitHub-репозитории.
@@ -45,6 +49,9 @@ if (!window.api) {
     getSystemRamGb: async () => 8,
     syncAndLaunch: async () => ({ success: false, error: 'Запуск игры доступен только в приложении-лаунчере' }),
     onLaunchProgress: () => {},
+    listOptionalMods: async () => ({ success: true, mods: [] }),
+    installOptionalMod: async () => ({ success: false, error: 'Доступно только в приложении-лаунчере' }),
+    uninstallOptionalMod: async () => ({ success: false, error: 'Доступно только в приложении-лаунчере' }),
   };
 }
 
@@ -98,6 +105,7 @@ nickInput.addEventListener('change', () => {
 
 // ---------- Настройки: плавное открытие/закрытие ----------
 function openSettings() {
+  if (modsOpen) closeMods();
   if (settingsOpen) return;
   settingsOpen = true;
 
@@ -108,6 +116,7 @@ function openSettings() {
   onlineRow.classList.add('hidden');
   playBtn.classList.add('hidden');
   topbarRight.classList.add('hidden');
+  modsLink.classList.add('hidden');
 
   settingsBtn.classList.add('spinning');
   setTimeout(() => settingsBtn.classList.remove('spinning'), 900);
@@ -123,10 +132,156 @@ function closeSettings() {
   onlineRow.classList.remove('hidden');
   playBtn.classList.remove('hidden');
   topbarRight.classList.remove('hidden');
+  modsLink.classList.remove('hidden');
 }
 
 settingsBtn.addEventListener('click', openSettings);
 backBtn.addEventListener('click', closeSettings);
+
+// ---------- Вкладка "Моды": плавное открытие/закрытие ----------
+let modsOpen = false;
+let modsLoaded = false;
+
+function openMods() {
+  if (settingsOpen) closeSettings();
+  if (modsOpen) return;
+  modsOpen = true;
+
+  modsPanel.classList.add('open');
+  appEl.classList.add('settings-open');
+  const panelWidth = modsPanel.getBoundingClientRect().width;
+  steve.style.transform = `translateX(-${panelWidth}px) scale(0.94)`;
+  onlineRow.classList.add('hidden');
+  playBtn.classList.add('hidden');
+  topbarRight.classList.add('hidden');
+  modsLink.classList.add('hidden');
+
+  if (!modsLoaded) {
+    modsLoaded = true;
+    loadOptionalMods();
+  }
+}
+
+function closeMods() {
+  if (!modsOpen) return;
+  modsOpen = false;
+
+  modsPanel.classList.remove('open');
+  appEl.classList.remove('settings-open');
+  steve.style.transform = '';
+  onlineRow.classList.remove('hidden');
+  playBtn.classList.remove('hidden');
+  topbarRight.classList.remove('hidden');
+  modsLink.classList.remove('hidden');
+}
+
+modsLink.addEventListener('click', openMods);
+modsBackBtn.addEventListener('click', closeMods);
+
+// ---------- Загрузка и отрисовка списка опциональных модов ----------
+// ВАЖНО: эти моды НИКОГДА не скачиваются автоматически. Они не участвуют
+// в синхронизации основного модпака (которая идёт с GitHub при нажатии
+// "Играть") - игрок сам решает, какой мод скачать, нажимая кнопку в этой
+// вкладке. Только тогда мод устанавливается и попадает в белый список.
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes} Б`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(0)} КБ`;
+  return `${(kb / 1024).toFixed(1)} МБ`;
+}
+
+async function loadOptionalMods() {
+  modsGrid.innerHTML = '<div class="mods-empty">Загрузка...</div>';
+  try {
+    const res = await window.api.listOptionalMods();
+    if (!res.success) {
+      modsGrid.innerHTML = `<div class="mods-empty">Ошибка: ${res.error}</div>`;
+      return;
+    }
+    renderModsGrid(res.mods);
+  } catch (err) {
+    modsGrid.innerHTML = `<div class="mods-empty">Ошибка: ${err.message}</div>`;
+  }
+}
+
+function renderModsGrid(mods) {
+  modsGrid.innerHTML = '';
+
+  if (!mods.length) {
+    modsGrid.innerHTML = '<div class="mods-empty">Пока нет доступных модов</div>';
+    return;
+  }
+
+  mods.forEach((mod) => {
+    const card = document.createElement('div');
+    card.className = 'mod-card';
+    if (mod.description) card.title = mod.description;
+
+    const icon = document.createElement('div');
+    icon.className = 'mod-card-icon';
+    if (mod.icon) {
+      const img = document.createElement('img');
+      img.className = 'mod-card-icon-img';
+      img.src = mod.icon;
+      img.alt = mod.name;
+      icon.appendChild(img);
+    } else {
+      icon.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="white" d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2zm0 2.3L6 7.6v7.8l6 3.3 6-3.3V7.6l-6-3.3z"/></svg>';
+    }
+
+    const name = document.createElement('div');
+    name.className = 'mod-card-name';
+    name.textContent = mod.name;
+
+    let desc = null;
+    if (mod.description) {
+      desc = document.createElement('div');
+      desc.className = 'mod-card-desc';
+      desc.textContent = mod.description;
+    }
+
+    const size = document.createElement('div');
+    size.className = 'mod-card-size';
+    size.textContent = formatSize(mod.sizeBytes);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `mod-card-btn ${mod.installed ? 'installed' : 'install'}`;
+    btn.textContent = mod.installed ? 'Установлен ✓' : 'Скачать';
+    btn.disabled = mod.installed;
+
+    // Скачивание начинается ТОЛЬКО по этому клику - никакой автоматики.
+    btn.addEventListener('click', async () => {
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.textContent = 'Установка...';
+      try {
+        const result = await window.api.installOptionalMod(mod.id);
+        if (result.success) {
+          btn.textContent = 'Установлен ✓';
+          btn.classList.remove('install');
+          btn.classList.add('installed');
+          showToast(`Мод «${mod.name}» установлен`);
+        } else {
+          btn.textContent = 'Скачать';
+          btn.disabled = false;
+          showToast(`Ошибка: ${result.error}`);
+        }
+      } catch (err) {
+        btn.textContent = 'Скачать';
+        btn.disabled = false;
+        showToast(`Ошибка: ${err.message}`);
+      }
+    });
+
+    card.appendChild(icon);
+    card.appendChild(name);
+    if (desc) card.appendChild(desc);
+    card.appendChild(size);
+    card.appendChild(btn);
+    modsGrid.appendChild(card);
+  });
+}
 
 async function loadStories() {
   let list = [];

@@ -17,6 +17,11 @@ const {
 const { launchGame } = require('./src/minecraft');
 const { syncModpack } = require('./src/mods');
 const { pingServer } = require('./src/monitor');
+const {
+  listOptionalMods,
+  installOptionalMod,
+  uninstallOptionalMod
+} = require('./src/optionalMods');
 
 // Ник: только латиница, цифры и подчёркивание, 3-16 символов (как в Minecraft).
 const NICK_REGEX = /^[A-Za-z0-9_]{3,16}$/;
@@ -188,6 +193,34 @@ ipcMain.handle('sync-and-launch', async (event, { username }) => {
     return { success: true };
   } catch (err) {
     send('launch-progress', { stage: 'error', text: err.message });
+    return { success: false, error: err.message };
+  }
+});
+
+// ---------- IPC: опциональные моды (вкладка "Моды", папка mod/) ----------
+
+ipcMain.handle('list-optional-mods', async () => {
+  try {
+    return { success: true, mods: listOptionalMods() };
+  } catch (err) {
+    return { success: false, error: err.message, mods: [] };
+  }
+});
+
+ipcMain.handle('install-optional-mod', async (event, id) => {
+  try {
+    const result = installOptionalMod(id);
+    return { success: true, ...result };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('uninstall-optional-mod', async (event, id) => {
+  try {
+    uninstallOptionalMod(id);
+    return { success: true };
+  } catch (err) {
     return { success: false, error: err.message };
   }
 });
